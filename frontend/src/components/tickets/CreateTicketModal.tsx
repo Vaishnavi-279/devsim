@@ -37,7 +37,7 @@ export default function CreateTicketModal({ onClose, onCreated }: Props) {
 
   useEffect(() => { usersAPI.getAll().then(r => setUsers(r.data)) }, [])
 
-  const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -145,7 +145,7 @@ export default function CreateTicketModal({ onClose, onCreated }: Props) {
           <div>
             <label style={labelStyle}>QA Testing Required</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button type="button" onClick={() => set('qa_required', !form.qa_required)}
+              <button type="button" onClick={() => setForm(f => ({ ...f, qa_required: !f.qa_required }))}
                 style={{
                   width: '44px', height: '24px', borderRadius: '99px', border: 'none',
                   background: form.qa_required ? '#6366f1' : '#e2e8f0',

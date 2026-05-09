@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { TicketCreate, TicketUpdate } from '../types'
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
@@ -35,8 +36,8 @@ export const authAPI = {
 export const ticketsAPI = {
   getAll: () => api.get('/tickets/'),
   getOne: (id: string) => api.get(`/tickets/${id}`),
-  create: (data: any) => api.post('/tickets/', data),
-  update: (id: string, data: any) => api.patch(`/tickets/${id}`, data),
+  create: (data: TicketCreate) => api.post('/tickets/', data),
+  update: (id: string, data: TicketUpdate) => api.patch(`/tickets/${id}`, data),
   delete: (id: string) => api.delete(`/tickets/${id}`),
 }
 

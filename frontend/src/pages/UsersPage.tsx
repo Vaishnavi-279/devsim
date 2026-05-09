@@ -12,9 +12,9 @@ const ROLE_STYLE: Record<string, { bg: string; color: string }> = {
   viewer:    { bg: '#f8fafc', color: '#64748b' },
 }
 
-const ROLE_INITIAL: Record<string, string> = {
-  admin: 'AD', manager: 'MG', developer: 'DV', qa_tester: 'QA', viewer: 'VW'
-}
+// const ROLE_INITIAL: Record<string, string> = {
+//   admin: 'AD', manager: 'MG', developer: 'DV', qa_tester: 'QA', viewer: 'VW'
+// }
 
 const AVATAR_COLOR: Record<string, string> = {
   admin: '#6366f1', manager: '#9333ea', developer: '#2563eb', qa_tester: '#16a34a', viewer: '#94a3b8'

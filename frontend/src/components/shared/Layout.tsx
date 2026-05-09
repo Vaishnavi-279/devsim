@@ -52,9 +52,9 @@ export default function Layout() {
               fontSize: '13.5px', fontWeight: 500, transition: 'all 0.12s',
               background: isActive ? '#1e1e2e' : 'transparent',
               color: isActive ? '#fff' : '#71717a',
-            })}
-              onMouseEnter={e => { if (!(e.currentTarget as any).classList.contains('active')) { e.currentTarget.style.background = '#18181b'; e.currentTarget.style.color = '#d4d4d8' } }}
-              onMouseLeave={e => { if (!(e.currentTarget as any).classList.contains('active')) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#71717a' } }}
+            })}             
+            onMouseEnter={e => { if (!e.currentTarget.classList.contains('active')) e.currentTarget.style.background = '#1e1e24'; e.currentTarget.style.color = '#fff' }}
+            onMouseLeave={e => { if (!e.currentTarget.classList.contains('active')) e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#71717a' }}
             >
               {icon}{label}
             </NavLink>

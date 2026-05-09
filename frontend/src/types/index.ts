@@ -72,3 +72,38 @@ export interface AuthResponse {
   token_type: string
   user: User
 }
+
+export interface TicketCreate {
+  title: string
+  ticket_type: string
+  priority: string
+  phase: string
+  user_story?: string
+  acceptance_criteria?: AcceptanceCriteria[]
+  developer_id?: string
+  assignee_id?: string
+  qa_required?: boolean
+  qa_tester_id?: string
+  time_taken?: number | null
+  time_unit?: string
+  sprint?: string
+  fix_version?: string
+}
+
+export interface TicketUpdate {
+  title?: string
+  ticket_type?: string
+  priority?: string
+  phase?: string
+  user_story?: string
+  acceptance_criteria?: AcceptanceCriteria[]
+  developer_id?: string
+  assignee_id?: string
+  qa_required?: boolean
+  qa_tester_id?: string
+  time_taken?: number | null
+  time_unit?: string
+  sprint?: string
+  fix_version?: string
+  comment?: string
+}
