@@ -8,6 +8,7 @@ interface Props {
   ticketId: string
   onClose: () => void
   onUpdated: (ticket: Ticket) => void
+  onDeleted: (ticketId: string) => void
 }
 
 const PRIORITY_STYLE: Record<string, { bg: string; color: string }> = {
@@ -40,7 +41,7 @@ const section: React.CSSProperties = {
   padding: '20px 24px', borderBottom: '1px solid #f8fafc'
 }
 
-export default function TicketDetailPanel({ ticketId, onClose, onUpdated }: Props) {
+export default function TicketDetailPanel({ ticketId, onClose, onUpdated, onDeleted }: Props) {
   const [ticket, setTicket] = useState<Ticket | null>(null)
   const [users, setUsers] = useState<User[]>([])
   const [comment, setComment] = useState('')
@@ -77,18 +78,19 @@ export default function TicketDetailPanel({ ticketId, onClose, onUpdated }: Prop
 }
 
 const handleDelete = async () => {
-    if (!ticket || !confirm(`Delete ${ticket.ticket_number}? This cannot be undone.`)) return
-    setDeleting(true)
-    try {
-      await ticketsAPI.delete(ticket.id)
-      toast.success('Ticket deleted!')
-      onClose()
-    } catch {
-      toast.error('Failed to delete ticket')
-    } finally {
-      setDeleting(false)
-    }
+  if (!ticket || !confirm(`Delete ${ticket.ticket_number}? This cannot be undone.`)) return
+  setDeleting(true)
+  try {
+    await ticketsAPI.delete(ticket.id)
+    toast.success('Ticket deleted!')
+    onDeleted(ticket.id)
+    onClose()
+  } catch {
+    toast.error('Failed to delete ticket')
+  } finally {
+    setDeleting(false)
   }
+}
 
   const getUserName = (id?: string) => {
     if (!id) return 'Unassigned'

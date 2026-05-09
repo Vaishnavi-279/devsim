@@ -181,6 +181,10 @@ export default function ListView() {
     ticketId={selectedTicketId}
     onClose={() => setSelectedTicketId(null)}
     onUpdated={updated => setTickets(ts => ts.map(t => t.id === updated.id ? updated : t))}
+    onDeleted={id => {
+      setTickets(ts => ts.filter(t => t.id !== id))
+      setSelectedTicketId(null)
+    }}
   />
 )}
     </div>

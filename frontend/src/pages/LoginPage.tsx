@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { authAPI } from '../api'
 import { useAuth } from '../hooks/useAuth'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 
 const S = {
   page: { minHeight: '100vh', display: 'flex', fontFamily: "'DM Sans', system-ui, sans-serif" } as React.CSSProperties,
@@ -136,9 +137,9 @@ export default function LoginPage() {
             </button>
             <p style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '16px' }}>
               New here?{' '}
-              <a href="/register" style={{ color: '#6366f1', fontWeight: 600, textDecoration: 'none' }}>
+              <Link to="/register" style={{ color: '#6366f1', fontWeight: 600, textDecoration: 'none' }}>
                 Create account
-              </a>
+              </Link>
             </p>
           </form>
 
