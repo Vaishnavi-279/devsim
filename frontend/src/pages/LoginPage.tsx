@@ -134,6 +134,12 @@ export default function LoginPage() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+            <p style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '16px' }}>
+              New here?{' '}
+              <a href="/register" style={{ color: '#6366f1', fontWeight: 600, textDecoration: 'none' }}>
+                Create account
+              </a>
+            </p>
           </form>
 
           {/* Divider */}

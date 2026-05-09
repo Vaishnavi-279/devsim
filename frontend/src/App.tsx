@@ -6,6 +6,7 @@ import BoardPage from './pages/BoardPage'
 import ListView from './pages/ListView'
 import UsersPage from './pages/UsersPage'
 import Layout from './components/shared/Layout'
+import RegisterPage from './pages/RegisterPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuth()
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="board" element={<BoardPage />} />
         <Route path="list" element={<ListView />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="/register" element={token ? <Navigate to="/" /> : <RegisterPage />} />
       </Route>
     </Routes>
   )

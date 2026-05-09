@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ticketsAPI, usersAPI } from '../../api'
 import type { Ticket, User } from '../../types'
 import toast from 'react-hot-toast'
+import { useAuth } from '../../hooks/useAuth'
 
 interface Props {
   ticketId: string
@@ -45,11 +46,49 @@ export default function TicketDetailPanel({ ticketId, onClose, onUpdated }: Prop
   const [comment, setComment] = useState('')
   const [newCriteria, setNewCriteria] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const { canCreateTicket } = useAuth()
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({
+    title: ticket?.title || '',
+    priority: ticket?.priority || '',
+    phase: ticket?.phase || '',
+  })
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    ticketsAPI.getOne(ticketId).then(r => setTicket(r.data))
+    ticketsAPI.getOne(ticketId).then(r => {
+      setTicket(r.data)
+      setEditForm({ title: r.data.title, priority: r.data.priority, phase: r.data.phase })
+    })
     usersAPI.getAll().then(r => setUsers(r.data))
   }, [ticketId])
+
+  const handleEdit = async () => {
+  if (!ticket) return
+  try {
+    const res = await ticketsAPI.update(ticket.id, editForm)
+    setTicket(res.data)
+    onUpdated(res.data)
+    setEditing(false)
+    toast.success('Ticket updated!')
+  } catch {
+    toast.error('Failed to update ticket')
+  }
+}
+
+const handleDelete = async () => {
+    if (!ticket || !confirm(`Delete ${ticket.ticket_number}? This cannot be undone.`)) return
+    setDeleting(true)
+    try {
+      await ticketsAPI.delete(ticket.id)
+      toast.success('Ticket deleted!')
+      onClose()
+    } catch {
+      toast.error('Failed to delete ticket')
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   const getUserName = (id?: string) => {
     if (!id) return 'Unassigned'
@@ -124,32 +163,94 @@ export default function TicketDetailPanel({ ticketId, onClose, onUpdated }: Prop
       }}>
 
         {/* Header */}
-        <div style={{ padding: '18px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div style={{ flex: 1, paddingRight: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+        <div style={{ padding: '18px 24px', borderBottom: '1px solid #f1f5f9', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '12px', fontFamily: 'monospace', color: '#94a3b8', fontWeight: 500 }}>{ticket.ticket_number}</span>
               <span style={{ fontSize: '18px' }}>{TYPE_ICON[ticket.ticket_type]}</span>
               <span style={{
                 padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700,
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-                background: PRIORITY_STYLE[ticket.priority]?.bg,
+                textTransform: 'uppercase', background: PRIORITY_STYLE[ticket.priority]?.bg,
                 color: PRIORITY_STYLE[ticket.priority]?.color
               }}>{ticket.priority}</span>
               <span style={{
                 padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700,
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-                background: PHASE_STYLE[ticket.phase]?.bg,
+                textTransform: 'uppercase', background: PHASE_STYLE[ticket.phase]?.bg,
                 color: PHASE_STYLE[ticket.phase]?.color
               }}>{PHASE_STYLE[ticket.phase]?.label}</span>
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+              {canCreateTicket && !editing && (
+                <>
+                  <button onClick={() => setEditing(true)}
+                    style={{
+                      padding: '5px 12px', border: '1.5px solid #e2e8f0', borderRadius: '6px',
+                      background: '#fff', fontSize: '12px', fontWeight: 600,
+                      color: '#64748b', cursor: 'pointer'
+                    }}>
+                    Edit
+                  </button>
+                  <button onClick={handleDelete} disabled={deleting}
+                    style={{
+                      padding: '5px 12px', border: '1.5px solid #fee2e2', borderRadius: '6px',
+                      background: '#fff', fontSize: '12px', fontWeight: 600,
+                      color: '#ef4444', cursor: 'pointer'
+                    }}>
+                    {deleting ? '...' : 'Delete'}
+                  </button>
+                </>
+              )}
+              <button onClick={onClose}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: '22px', lineHeight: 1 }}>
+                ×
+              </button>
+            </div>
+          </div>
+
+          {/* Title — View or Edit mode */}
+          {editing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <input value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
+                style={{
+                  width: '100%', padding: '9px 12px', border: '1.5px solid #6366f1',
+                  borderRadius: '7px', fontSize: '15px', fontWeight: 600, color: '#0f172a',
+                  outline: 'none', fontFamily: "'DM Sans', system-ui, sans-serif"
+                }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <select value={editForm.priority} onChange={e => setEditForm(f => ({ ...f, priority: e.target.value }))}
+                  style={{ padding: '8px 12px', border: '1.5px solid #e2e8f0', borderRadius: '7px', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+                <select value={editForm.phase} onChange={e => setEditForm(f => ({ ...f, phase: e.target.value }))}
+                  style={{ padding: '8px 12px', border: '1.5px solid #e2e8f0', borderRadius: '7px', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
+                  <option value="analysis">Analysis</option>
+                  <option value="todo">To Do</option>
+                  <option value="on_hold">On Hold</option>
+                  <option value="in_development">In Development</option>
+                  <option value="dev_testing">Dev Testing</option>
+                  <option value="qa_testing">QA Testing</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={handleEdit}
+                  style={{ padding: '8px 16px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '7px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                  Save Changes
+                </button>
+                <button onClick={() => setEditing(false)}
+                  style={{ padding: '8px 16px', border: '1.5px solid #e2e8f0', borderRadius: '7px', background: '#fff', fontSize: '13px', fontWeight: 500, color: '#64748b', cursor: 'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
             <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', lineHeight: 1.3 }}>
               {ticket.title}
             </h2>
-          </div>
-          <button onClick={onClose} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: '#94a3b8', fontSize: '22px', lineHeight: 1, padding: '2px', flexShrink: 0
-          }}>×</button>
+          )}
         </div>
 
         {/* Scrollable Content */}
